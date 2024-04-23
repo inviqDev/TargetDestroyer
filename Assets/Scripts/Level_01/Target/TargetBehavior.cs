@@ -1,21 +1,19 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class TargetBehavior : MonoBehaviour
 {
+    private TargetManager _targetManager;
+    private PlayerAimController _playerAimController;
+
     private string _playZoneTag = "PlayZone";
     private Bounds _playZoneBounds;
     private string _boundTag = "Bound";
 
-    private UserInterfaceManager _userInterfaceManager;
-    public int catchScorePoint;
-
-    private TargetManager _targetManager;
     private Rigidbody _targetRb;
 
     private Vector3 _defaultLocalScale;
-    private float _minScaleModifier = 0.25f;
-    private float _maxScaleModifier = 2.0f;
+    private float _minScaleModifier = 0.75f;
+    private float _maxScaleModifier = 2.25f;
 
     private Vector3 _startPosition;
 
@@ -26,26 +24,27 @@ public class TargetBehavior : MonoBehaviour
     public bool NeedToLaunch { get; private set; }
 
 
-
-    private void Start()
+    private void Awake()
     {
+        _playerAimController = SetAimControllerReference();
         GameObject playZone = GameObject.FindGameObjectWithTag(_playZoneTag);
 
-        if (playZone != null)
+        if (playZone != null && _playerAimController != null)
         {
             _targetManager = transform.parent.GetComponent<TargetManager>();
             _startPosition = transform.position;
 
-
             BoxCollider playZoneBox = playZone.GetComponent<BoxCollider>();
             _playZoneBounds = playZoneBox.bounds;
-
-
-            _targetRb = GetComponent<Rigidbody>();
-            _defaultLocalScale = _targetRb.transform.localScale;
-
-            _userInterfaceManager = GetUIMangerReference();
         }
+
+        _targetRb = GetComponent<Rigidbody>();
+    }
+
+
+    private void Start()
+    {
+        _defaultLocalScale = _targetRb.transform.localScale;
     }
 
 
@@ -60,6 +59,20 @@ public class TargetBehavior : MonoBehaviour
         }
     }
 
+
+    private PlayerAimController SetAimControllerReference()
+    {
+        PlayerAimController aimController = FindObjectOfType<PlayerAimController>();
+        if (aimController != null)
+        {
+            return aimController;
+        }
+        else
+        {
+            Debug.Log("PlayerAimController component is not found in the game !");
+            return null;
+        }
+    }
 
 
     private Vector3 GetPointToMovePosition()
@@ -106,23 +119,6 @@ public class TargetBehavior : MonoBehaviour
         return randomScale;
     }
 
-    private UserInterfaceManager GetUIMangerReference()
-    {
-        var UIManager = GameObject.FindObjectOfType<UserInterfaceManager>();
-
-        if (UIManager == null)
-        {
-            Debug.Log("User Interface Manager component is not found in the game !");
-        }
-        else
-        {
-            return UIManager;
-        }
-
-        return null;
-    }
-
-
 
 
     private void LaunchTarget()
@@ -143,28 +139,16 @@ public class TargetBehavior : MonoBehaviour
 
 
 
-    private void ResetTargetSettings()
+    private void ResetTargetBehavior()
     {
-        _startPosition = _targetManager.SetTargetStartPosition();
-        transform.position = _startPosition;
+        transform.position = _targetManager.SetTargetStartPosition();
 
         _targetRb.velocity = Vector3.zero;
         _targetRb.angularVelocity = Vector3.zero;
-
         _targetRb.transform.localScale = _defaultLocalScale;
 
         gameObject.SetActive(false);
     }
-
-    private void CheckNeedToLaunchNewWave()
-    {
-        bool foundActiveTarget = _targetManager.FindActiveTargets();
-        if (!foundActiveTarget)
-        {
-            _targetManager.LaunchTargetWave();
-        }
-    }
-
 
 
 
@@ -172,18 +156,20 @@ public class TargetBehavior : MonoBehaviour
     {
         if (other.gameObject.CompareTag(_boundTag))
         {
-            SceneLoader sceneLoader = GameObject.FindObjectOfType<SceneLoader>();
+            CurrentLevelSceneLoader sceneLoader = GameObject.FindObjectOfType<CurrentLevelSceneLoader>();
             sceneLoader.ShowEndGameMenu();
+            Debug.Log("FIX");
         }
     }
 
 
     private void OnMouseDown()
     {
-        _targetManager.PlayOnDestroySound();
-        _userInterfaceManager.IncreaseCounterValue(catchScorePoint);
+        ResetTargetBehavior();
 
-        ResetTargetSettings();
-        CheckNeedToLaunchNewWave();
+        _targetManager.LaunchTargetWave();
+        _targetManager.PlayOnDestroySound();
+
+        _targetManager.OnClickIncreaseScore();
     }
 }

@@ -11,11 +11,12 @@ public class TargetManager : MonoBehaviour
     public int targetsAmountToPool;
     public int _amountToLaunch;
 
+    private CurrentLevelUIManager _levelUIManager;
     private AudioSource _audioSource;
 
 
 
-    void Start()
+    void Awake()
     {
         ObjectPooler pooler = ObjectPooler.Instance;
 
@@ -26,7 +27,9 @@ public class TargetManager : MonoBehaviour
                 _pooledTargets = SetUpPooledTargetsArray(pooler);
             }
 
+            _levelUIManager = GetComponent<CurrentLevelUIManager>();
             _audioSource = GetComponent<AudioSource>();
+
             StartCoroutine(nameof(LaunchTargetCoroutine));
         }
     }
@@ -46,7 +49,6 @@ public class TargetManager : MonoBehaviour
         return pooledTargets;
     }
 
-
     public Vector3 SetTargetStartPosition()
     {
         int randomIndex = Random.Range(0, _startPositonBoxes.Length);
@@ -54,7 +56,7 @@ public class TargetManager : MonoBehaviour
 
         float xPosition = selectedBox.bounds.center.x;
         float yPosition = Random.Range(selectedBox.bounds.min.y, selectedBox.bounds.max.y);
-        float zPosition = this.gameObject.transform.position.z;
+        float zPosition = selectedBox.gameObject.transform.position.z;
 
         Vector3 startPosition = new(xPosition, yPosition, zPosition);
         return startPosition;
@@ -72,14 +74,15 @@ public class TargetManager : MonoBehaviour
         }
     }
 
-
     private IEnumerator LaunchTargetCoroutine()
     {
-        yield return new WaitForSeconds(2.0f);
+        float launchDelay = 2.0f;
+        yield return new WaitForSeconds(launchDelay);
 
         LaunchTargetWave();
 
-        Invoke(nameof(StopLaunchingCoroutine), 2.0f);
+        float stopDelay = 2.0f;
+        Invoke(nameof(StopLaunchingCoroutine), stopDelay);
     }
 
     public void StopLaunchingCoroutine()
@@ -87,17 +90,22 @@ public class TargetManager : MonoBehaviour
         StopCoroutine(nameof(LaunchTargetCoroutine));
     }
 
+
+
     public void LaunchTargetWave()
     {
-        for (int i = 0; i < _amountToLaunch; i++)
+        bool activeTargetExist = FindActiveTargets();
+        if (!activeTargetExist)
         {
-            LaunchTarget(i);
+            for (int i = 0; i < _amountToLaunch; i++)
+            {
+                LaunchTarget(i);
+            }
+
+            _amountToLaunch++;
         }
-
-        _amountToLaunch++;
     }
-
-    public bool FindActiveTargets()
+    private bool FindActiveTargets()
     {
         for (int i = 0; i < _pooledTargets.Length; i++)
         {
@@ -111,8 +119,15 @@ public class TargetManager : MonoBehaviour
         return false;
     }
 
+
+
     public void PlayOnDestroySound()
     {
         _audioSource.PlayOneShot(_audioSource.clip);
+    }
+
+    public void OnClickIncreaseScore()
+    {
+        _levelUIManager.SetScoreTextFieldValue();
     }
 }

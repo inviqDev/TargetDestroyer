@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class SceneLoader : MonoBehaviour
+public class CurrentLevelSceneLoader : MonoBehaviour
 {
     [SerializeField] private Transform _startGameMenu;
     [SerializeField] private Transform _endGameMenu;
@@ -13,10 +13,6 @@ public class SceneLoader : MonoBehaviour
 
     private void Awake()
     {
-        Time.timeScale = _pauseGameTimeScaleValue;
-        Cursor.visible = true;
-
-
         if (!_startGameMenu.gameObject.activeInHierarchy)
         {
             _startGameMenu.gameObject.SetActive(true);
@@ -48,5 +44,10 @@ public class SceneLoader : MonoBehaviour
     {
         int levelIndex = SceneManager.GetActiveScene().buildIndex;
         SceneManager.LoadScene(levelIndex);
+    }
+
+    public void LoadStartMenuScene()
+    {
+
     }
 }
