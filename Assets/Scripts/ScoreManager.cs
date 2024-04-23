@@ -109,6 +109,8 @@ public class ScoreManager : MonoBehaviour
         CurrentScore += scoreIncrement;
     }
 
+
+
     public void SaveScore(string playerName)
     {
         KeyValuePair<string, int> minScorePair = 

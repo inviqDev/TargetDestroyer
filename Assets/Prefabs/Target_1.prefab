@@ -147,9 +147,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccc31a9c1f644f146ace73c696268162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minSpeedForce: 5
-  maxSpeedForce: 12
-  torqueForce: 14
+  minSpeedForce: 15
+  maxSpeedForce: 30
+  torqueForce: 25
 --- !u!82 &4834705024580936978
 AudioSource:
   m_ObjectHideFlags: 0
