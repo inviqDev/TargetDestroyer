@@ -11,7 +11,8 @@ public class GlobalSceneManager : MonoBehaviour
 
     private void Awake()
     {
-        UnpauseGame();
+        Time.timeScale = 0.0f;
+        Cursor.visible = true;
     }
 
 
@@ -19,25 +20,31 @@ public class GlobalSceneManager : MonoBehaviour
     public void PauseGame(float timeScaleValue = 0.0f, bool isVisible = true)
     {
         Time.timeScale = timeScaleValue;
-        // Cursor.visible = isVisible;
+        Cursor.visible = isVisible;
     }
 
 
     public void UnpauseGame(float timeScaleValue = 1.0f, bool isVisible = false)
     {
         Time.timeScale = 1.0f;
+        Cursor.visible = isVisible;
         // To implement in the future :         Cursor.visible = false;
     }
 
 
-    public void LoadStartMenu()
+    public void LoadStartMenu(bool isVisible = true)
     {
+        Cursor.visible = isVisible;
+
         SceneManager.LoadScene(_startMenuSceneIndex);
     }
 
 
     public void LoadLastScene()
     {
+        UnpauseGame();
+        MainManager.Instance.ScoreManager.ResetPlayerCurrentScoreValue();
+
         SceneManager.LoadScene(lastSceneIndex);
     }
 
