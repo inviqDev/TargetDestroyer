@@ -6,6 +6,7 @@ TagManager:
   tags:
   - PlayZone
   - Bound
+  - Target
   layers:
   - Default
   - TransparentFX
@@ -13,8 +14,8 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
+  - MouseHitDetector
+  - UserInterface
   - 
   - 
   - 
